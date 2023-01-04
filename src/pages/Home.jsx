@@ -72,6 +72,8 @@ const Home = () => {
         setCapsuleData(newData);
     }
 
+    {console.log('data', capsuleData)}
+
     if (isLoading) return <Loading />
     if (error) return <Error />
 
