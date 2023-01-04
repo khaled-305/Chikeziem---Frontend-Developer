@@ -40,7 +40,6 @@ const navigation = [
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 const Home = () => {
-    const [capsuleData, setCapsuleData] = React.useState([]);
     const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
     const [searchTerm, setSearchTerm] = React.useState('');
     const [pageIndex, setPageIndex] = React.useState(0);
@@ -63,16 +62,7 @@ const Home = () => {
     const { data, error, isLoading } =
         useSWR(`https://api.spacexdata.com/latest/capsules/?query=${pageIndex}`, fetcher);
 
-    React.useEffect(() => {
-        setCapsuleData(data);
-    },[])
-
-    const handleSearch = () => {
-        const newData = capsuleData?.filter(x => x.type == (searchTerm == '' ? x.type : searchTerm));
-        setCapsuleData(newData);
-    }
-
-    {console.log('data', capsuleData)}
+    // console.log(data)
 
     if (isLoading) return <Loading />
     if (error) return <Error />
@@ -182,18 +172,8 @@ const Home = () => {
                                     id="search"
                                     type="text"
                                     name="search"
-                                    placeholder="Search SpaceX Data....."
+                                    placeholder="Search Capsule Data with type or serial..."
                                 />
-
-                                <a
-                                    onClick={() => handleSearch()}
-                                    className="inline-block rounded-lg bg-blue-600 px-4 py-1.5 text-base font-semibold leading-7 text-white shadow-sm ring-1 ring-blue-600 hover:bg-blue-700 hover:ring-blue-700 cursor-pointer"
-                                >
-                                    Search
-                                    <span className="text-indigo-200" aria-hidden="true">
-                                        &rarr;
-                                    </span>
-                                </a>
                             </form>
                         </div>
                     </div>
@@ -209,9 +189,10 @@ const Home = () => {
                     <div className="flex flex-col">
                         {/** Card Grid */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-4 gap-4">
-                            {capsuleData && capsuleData?.length > 0 ? capsuleData?.map((capsule) =>
+                            {data?.filter((capsule) => capsule?.type?.toLowerCase()?.includes(searchTerm) || capsule?.serial?.toLowerCase()?.includes(searchTerm)
+                            )?.map((capsule) =>
 
-                                <div key={capsule.id} onClick={() => handleOpen(capsule)} className="flex items-start p-4 rounded-xl shadow-lg bg-white cursor-pointer">
+                                <div key={capsule?.id} onClick={() => handleOpen(capsule)} className="flex items-start p-4 rounded-xl shadow-lg bg-white cursor-pointer">
                                     <div className="flex items-center justify-center bg-blue-50 h-12 w-12 rounded-full border border-blue-100">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
@@ -223,7 +204,7 @@ const Home = () => {
                                     </div>
                                 </div>
 
-                            ) : <h2>Capsule Data Not Found</h2>}
+                            )}
                         </div>
 
                         {/** Modal Pop-Up */}
